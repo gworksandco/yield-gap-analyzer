@@ -23,7 +23,7 @@ _SAKE_AD_HTML = """
 """
 
 # コピーの行数が広告ごとに違っても画像の位置が揃うよう、テキスト部分の高さを固定する
-_COPY_BOX_HEIGHT_PX = 110
+_COPY_BOX_HEIGHT_PX = 170
 
 _PR_LABEL = '<span style="font-size: 0.75rem; color: #888;">[PR]</span>'
 
@@ -31,7 +31,7 @@ _PR_LABEL = '<span style="font-size: 0.75rem; color: #888;">[PR]</span>'
 def _render_ad_block(heading: str, body: str, ad_html: str) -> str:
     return f"""
 <div style="text-align: center;">
-  <div style="min-height: {_COPY_BOX_HEIGHT_PX}px;">
+  <div style="height: {_COPY_BOX_HEIGHT_PX}px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start;">
     <p style="font-weight: 600; font-size: 1rem; margin-bottom: 0.3rem;">{heading}</p>
     <p style="font-size: 0.9rem; color: inherit; margin-bottom: 0.3rem;">{body}</p>
     {_PR_LABEL}
