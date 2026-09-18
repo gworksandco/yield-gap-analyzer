@@ -22,7 +22,7 @@ def render_filters() -> dict:
         value=20,
         step=5,
         format="%d%%",
-        help="(現在の利回り / 過去5年平均利回り) - 1 がこの値以上の銘柄を「買いサイン」とする",
+        help="現在の配当利回りが、過去5年平均よりどれだけ割安（高利回り）になっているかを示します。値が大きいほど「今が買い時」の可能性が高い銘柄です。",
     )
     min_yield_gap_ratio = min_yield_gap_ratio_pct / 100
 
