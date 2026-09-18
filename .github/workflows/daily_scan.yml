@@ -1,10 +1,15 @@
-name: Daily Yield-Gap Scan
+﻿name: Daily Yield-Gap Scan
 
 on:
   schedule:
     # 毎日 21:00 JST (12:00 UTC)
     - cron: "0 12 * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "動作確認用の対象銘柄数の上限（空欄なら全銘柄をスキャン）"
+        required: false
+        default: ""
 
 jobs:
   scan:
@@ -22,7 +27,12 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run scan
-        run: python scanner/run_scan.py
+        run: |
+          if [ -n "${{ github.event.inputs.limit }}" ]; then
+            python scanner/run_scan.py --limit "${{ github.event.inputs.limit }}"
+          else
+            python scanner/run_scan.py
+          fi
 
       - name: Commit updated results
         run: |
