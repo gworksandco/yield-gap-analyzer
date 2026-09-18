@@ -101,7 +101,7 @@ def fetch_dividend_yields(ticker: str, num_years: int = NUM_YEARS) -> DividendFe
 
         dividends = _retry_call(lambda: tk.dividends)
         # 十分な長さの価格履歴（配当計算の年末終値取得のため）
-        history = _retry_call(lambda: tk.history, period=f"{num_years + 1}y", interval="1d")
+        history = _retry_call(lambda: tk.history(period=f"{num_years + 1}y", interval="1d"))
 
         info = _retry_call(lambda: tk.fast_info)
         current_price = float(info.get("lastPrice")) if info and info.get("lastPrice") else None
