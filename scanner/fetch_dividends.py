@@ -18,7 +18,7 @@ from __future__ import annotations
 import logging
 import random
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from typing import Optional
 
@@ -35,7 +35,12 @@ BASE_BACKOFF_SECONDS = 2.0
 REQUEST_INTERVAL_SECONDS = 0.3  # 銘柄間の最低待機時間（+ジッター）
 JITTER_SECONDS = 0.2
 
-NUM_YEARS = 5
+NUM_YEARS = 5  # 「過去5年平均利回り」の算出対象年数（元の要件どおり5年で固定）
+
+# 「連続非減配年数」の判定に使う遡り年数。
+# tk.dividends は上場来の全配当履歴を1回のリクエストで返すため、この年数を
+# 増やしてもネットワークコストは増えない（追加の株価取得も不要なため）。
+STREAK_LOOKBACK_YEARS = 10
 
 
 @dataclass
@@ -43,8 +48,9 @@ class DividendFetchResult:
     ticker: str
     current_price: Optional[float]
     current_year_dividend: Optional[float]  # 直近期の実績配当（1株あたり）
-    yearly_yields: list[YearlyDividendYield]
+    yearly_yields: list[YearlyDividendYield]  # 過去5年分（平均利回り計算用、株価も含む）
     fetch_ok: bool
+    extended_dividend_years: list[YearlyDividendYield] = field(default_factory=list)  # 過去最大10年分（連続非減配年数の判定専用、株価は含まない）
     error: Optional[str] = None
 
 
@@ -82,6 +88,30 @@ def _annual_dividends_from_history(dividends: pd.Series) -> dict[int, float]:
         return {}
     by_year = dividends.groupby(dividends.index.year).sum()
     return {int(year): float(amount) for year, amount in by_year.items()}
+
+
+def _extended_dividend_years(
+    annual_div: dict[int, float], num_years: int, latest_complete_year: int
+) -> list[YearlyDividendYield]:
+    """連続非減配年数の判定専用に、株価なしで配当額のみ最大num_years年分並べる。
+
+    annual_divはtk.dividends（上場来の全履歴）から集計済みのため、ここでは
+    追加のネットワークアクセスは発生しない。
+    """
+    target_years = range(latest_complete_year - num_years + 1, latest_complete_year + 1)
+    result: list[YearlyDividendYield] = []
+    for fy in target_years:
+        div = annual_div.get(fy, 0.0)
+        result.append(
+            YearlyDividendYield(
+                fiscal_year=fy,
+                dividend_per_share=div,
+                reference_price=None,
+                yield_value=0.0,
+                is_missing=(div <= 0),
+            )
+        )
+    return result
 
 
 def _price_for_year(history: pd.DataFrame, year: int) -> Optional[float]:
@@ -142,11 +172,16 @@ def fetch_dividend_yields(ticker: str, num_years: int = NUM_YEARS) -> DividendFe
 
         current_year_dividend = annual_div.get(latest_complete_year, 0.0)
 
+        extended_dividend_years = _extended_dividend_years(
+            annual_div, STREAK_LOOKBACK_YEARS, latest_complete_year
+        )
+
         return DividendFetchResult(
             ticker=ticker,
             current_price=current_price,
             current_year_dividend=current_year_dividend,
             yearly_yields=yearly_yields,
+            extended_dividend_years=extended_dividend_years,
             fetch_ok=True,
         )
     except Exception as exc:
@@ -156,6 +191,7 @@ def fetch_dividend_yields(ticker: str, num_years: int = NUM_YEARS) -> DividendFe
             current_price=None,
             current_year_dividend=None,
             yearly_yields=[],
+            extended_dividend_years=[],
             fetch_ok=False,
             error=str(exc),
         )

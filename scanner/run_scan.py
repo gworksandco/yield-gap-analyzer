@@ -50,7 +50,7 @@ def scan_single_stock(ticker: str, company_name: str) -> StockRecord | None:
     yield_gap_ratio = StockRecord.compute_yield_gap_ratio(current_yield, avg_yield_5y)
 
     fundamentals = fetch_fundamentals(ticker)
-    consecutive_no_cut_years = compute_consecutive_no_cut_years(div_result.yearly_yields)
+    consecutive_no_cut_years = compute_consecutive_no_cut_years(div_result.extended_dividend_years)
 
     data_quality_flag = None
     if not fundamentals.fetch_ok:
