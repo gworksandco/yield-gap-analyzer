@@ -17,5 +17,14 @@ _AD_HTML = """
 
 
 def render_affiliate() -> None:
-    st.markdown("##### 代わり映えない日常に、変化を。")
+    st.markdown(
+        """
+##### 代わり映えない日常に、変化を。
+配当を眺めるだけでなく、たまには自分へのご褒美も。
+週末は、こだわりのお取り寄せグルメで少し贅沢な時間を過ごしてみませんか。
+
+<span style="font-size: 0.75rem; color: #888;">[PR]</span>
+        """,
+        unsafe_allow_html=True,
+    )
     st.markdown(_AD_HTML, unsafe_allow_html=True)
