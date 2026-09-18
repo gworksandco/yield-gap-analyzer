@@ -30,13 +30,13 @@ _PR_LABEL = '<span style="font-size: 0.75rem; color: #888;">[PR]</span>'
 
 def _render_ad_block(heading: str, body: str, ad_html: str) -> str:
     return f"""
-<div style="text-align: center;">
-  <div style="height: {_COPY_BOX_HEIGHT_PX}px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start;">
+<div>
+  <div style="height: {_COPY_BOX_HEIGHT_PX}px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; text-align: left;">
     <p style="font-weight: 600; font-size: 1rem; margin-bottom: 0.3rem;">{heading}</p>
     <p style="font-size: 0.9rem; color: inherit; margin-bottom: 0.3rem;">{body}</p>
     {_PR_LABEL}
   </div>
-  <div style="margin-top: 0.5rem;">
+  <div style="margin-top: 0.5rem; text-align: center;">
     {ad_html}
   </div>
 </div>
