@@ -76,6 +76,14 @@ def render_filters() -> dict:
         step=0.1,
     )
 
+    max_payout_ratio = st.sidebar.number_input(
+        "配当性向 上限（%）（0=フィルタなし）",
+        min_value=0.0,
+        value=0.0,
+        step=5.0,
+        help="利益に対して配当に回している割合。高すぎる銘柄（無理をして配当を出している可能性）を除外できます。データなしの銘柄は除外しません。",
+    )
+
     return {
         "min_yield_gap_ratio": min_yield_gap_ratio,
         "min_current_yield": min_current_yield,
@@ -84,6 +92,7 @@ def render_filters() -> dict:
         "min_consecutive_no_cut_years": min_consecutive_no_cut_years,
         "max_per": max_per if max_per > 0 else None,
         "max_pbr": max_pbr if max_pbr > 0 else None,
+        "max_payout_ratio": max_payout_ratio if max_payout_ratio > 0 else None,
     }
 
 
@@ -113,6 +122,9 @@ def apply_filters(df: pd.DataFrame, filters: dict) -> pd.DataFrame:
 
     if filters.get("max_pbr") and "pbr" in out.columns:
         mask &= out["pbr"].isna() | (out["pbr"] <= filters["max_pbr"])
+
+    if filters.get("max_payout_ratio") and "payout_ratio" in out.columns:
+        mask &= out["payout_ratio"].isna() | (out["payout_ratio"] <= filters["max_payout_ratio"])
 
     out = out[mask].copy()
 

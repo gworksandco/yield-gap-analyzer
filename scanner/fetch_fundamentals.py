@@ -5,6 +5,9 @@
 - market_cap: 時価総額
 - equity_ratio: 自己資本比率（%） = 純資産 / 総資産 * 100
 - per, pbr: 参考指標
+- payout_ratio: 配当性向（%）。利回りが高くても配当性向が高すぎる（利益の大半を
+  配当に回している）銘柄を除外できるようにするための指標。get_info()で既に
+  取得しているレスポンスに含まれるため、追加のAPI呼び出しコストは発生しない
 - consecutive_no_cut_years の算出に使う年次配当系列は fetch_dividends 側の
   yearly_yields（dividend_per_share）から計算する（このモジュールでは扱わない）
 """
@@ -30,6 +33,7 @@ class FundamentalsResult:
     per: Optional[float]
     pbr: Optional[float]
     fetch_ok: bool
+    payout_ratio: Optional[float] = None
     error: Optional[str] = None
 
 
@@ -41,6 +45,7 @@ def fetch_fundamentals(ticker: str) -> FundamentalsResult:
         market_cap = info.get("marketCap")
         per = info.get("trailingPE")
         pbr = info.get("priceToBook")
+        payout_ratio_raw = info.get("payoutRatio")
 
         equity_ratio = _compute_equity_ratio(tk)
 
@@ -50,6 +55,8 @@ def fetch_fundamentals(ticker: str) -> FundamentalsResult:
             equity_ratio=equity_ratio,
             per=float(per) if per else None,
             pbr=float(pbr) if pbr else None,
+            # yfinanceのpayoutRatioは比率（0.4 = 40%）で返るため%表記に変換
+            payout_ratio=float(payout_ratio_raw) * 100 if payout_ratio_raw is not None else None,
             fetch_ok=True,
         )
     except Exception as exc:
@@ -60,6 +67,7 @@ def fetch_fundamentals(ticker: str) -> FundamentalsResult:
             equity_ratio=None,
             per=None,
             pbr=None,
+            payout_ratio=None,
             fetch_ok=False,
             error=str(exc),
         )

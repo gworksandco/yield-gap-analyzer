@@ -47,6 +47,7 @@ class StockRecord:
     consecutive_no_cut_years: int = 0  # 連続非減配年数
     per: Optional[float] = None
     pbr: Optional[float] = None
+    payout_ratio: Optional[float] = None  # 配当性向（%）
 
     # --- メタ情報 ---
     last_updated: date = field(default_factory=date.today)

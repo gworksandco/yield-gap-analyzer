@@ -74,6 +74,7 @@ def scan_single_stock(ticker: str, company_name: str) -> StockRecord | None:
         consecutive_no_cut_years=consecutive_no_cut_years,
         per=fundamentals.per,
         pbr=fundamentals.pbr,
+        payout_ratio=fundamentals.payout_ratio,
         last_updated=date.today(),
         data_quality_flag=data_quality_flag,
     )

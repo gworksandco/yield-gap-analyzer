@@ -18,6 +18,7 @@ DISPLAY_COLUMNS = {
     "consecutive_no_cut_years": "連続非減配年数",
     "per": "PER",
     "pbr": "PBR",
+    "payout_ratio": "配当性向(%)",
 }
 
 HIGHLIGHT_STYLE = "background-color: #ffb3b3; color: #7a0000; font-weight: 600;"
