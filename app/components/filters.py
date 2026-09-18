@@ -19,7 +19,7 @@ def render_filters() -> dict:
         "利回り乖離率の下限（買いサイン判定）",
         min_value=0,
         max_value=200,
-        value=20,
+        value=50,
         step=5,
         format="%d%%",
         help="現在の配当利回りが、過去5年平均よりどれだけ割安（高利回り）になっているかを示します。値が大きいほど「今が買い時」の可能性が高い銘柄です。",
@@ -30,7 +30,7 @@ def render_filters() -> dict:
         "現在利回りの下限",
         min_value=0.0,
         max_value=10.0,
-        value=0.0,
+        value=3.0,
         step=0.1,
         format="%.1f%%",
         help="現在の予想（実績）配当利回りがこの値以上の銘柄のみ表示する",
@@ -42,7 +42,7 @@ def render_filters() -> dict:
     min_market_cap_oku = st.sidebar.number_input(
         "時価総額 下限（億円）",
         min_value=0,
-        value=100,
+        value=500,
         step=50,
     )
 
@@ -58,7 +58,7 @@ def render_filters() -> dict:
         "連続非減配年数 下限",
         min_value=0,
         max_value=10,
-        value=3,
+        value=5,
         step=1,
     )
 
