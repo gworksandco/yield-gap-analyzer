@@ -1,5 +1,5 @@
 """
-Yield-Gap Analyzer（高配当優良株の過去平均利回り乖離スクリーナー）
+優良株配当利回り乖離スクリーナー
 
 data/results.csv（GitHub Actionsの夜間バッチが書き出す）を読むだけで、
 計算処理は一切行わない構成（ネットキャッシュ版と同じ設計）。
@@ -21,7 +21,7 @@ from app.components.result_table import render_result_table  # noqa: E402
 
 DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "results.csv"
 
-st.set_page_config(page_title="Yield-Gap Analyzer", layout="wide")
+st.set_page_config(page_title="優良株配当利回り乖離スクリーナー", layout="wide")
 
 
 @st.cache_data(ttl=3600)
@@ -32,8 +32,7 @@ def load_data() -> pd.DataFrame:
 
 
 def main() -> None:
-    st.title("Yield-Gap Analyzer")
-    st.caption("高配当優良株の過去平均利回り乖離スクリーナー")
+    st.title("優良株配当利回り乖離スクリーナー")
 
     df = load_data()
 

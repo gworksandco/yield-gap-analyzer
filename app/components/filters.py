@@ -15,15 +15,27 @@ def render_filters() -> dict:
     """サイドバーにフィルタスライダーを表示し、選択された閾値をdictで返す。"""
     st.sidebar.header("フィルタ条件")
 
-    min_yield_gap_ratio = st.sidebar.slider(
+    min_yield_gap_ratio_pct = st.sidebar.slider(
         "利回り乖離率の下限（買いサイン判定）",
-        min_value=0.0,
-        max_value=2.0,
-        value=0.2,
-        step=0.05,
-        format="%.2f",
+        min_value=0,
+        max_value=200,
+        value=20,
+        step=5,
+        format="%d%%",
         help="(現在の利回り / 過去5年平均利回り) - 1 がこの値以上の銘柄を「買いサイン」とする",
     )
+    min_yield_gap_ratio = min_yield_gap_ratio_pct / 100
+
+    min_current_yield_pct = st.sidebar.slider(
+        "現在利回りの下限",
+        min_value=0.0,
+        max_value=10.0,
+        value=0.0,
+        step=0.1,
+        format="%.1f%%",
+        help="現在の予想（実績）配当利回りがこの値以上の銘柄のみ表示する",
+    )
+    min_current_yield = min_current_yield_pct / 100
 
     st.sidebar.subheader("優良株フィルタ")
 
@@ -66,6 +78,7 @@ def render_filters() -> dict:
 
     return {
         "min_yield_gap_ratio": min_yield_gap_ratio,
+        "min_current_yield": min_current_yield,
         "min_market_cap": min_market_cap_oku * 1e8,
         "min_equity_ratio": min_equity_ratio,
         "min_consecutive_no_cut_years": min_consecutive_no_cut_years,
@@ -82,6 +95,9 @@ def apply_filters(df: pd.DataFrame, filters: dict) -> pd.DataFrame:
     out = df.copy()
 
     mask = pd.Series(True, index=out.index)
+
+    if "current_yield" in out.columns:
+        mask &= out["current_yield"] >= filters["min_current_yield"]
 
     if "market_cap" in out.columns:
         mask &= out["market_cap"].isna() | (out["market_cap"] >= filters["min_market_cap"])
