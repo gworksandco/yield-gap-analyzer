@@ -16,6 +16,7 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.components.affiliate import render_affiliate  # noqa: E402
+from app.components.related_sites import render_related_sites  # noqa: E402
 from app.components.disclaimer import render_disclaimer  # noqa: E402
 from app.components.filters import apply_filters, render_filters  # noqa: E402
 from app.components.result_table import render_result_table  # noqa: E402
@@ -84,6 +85,7 @@ def main() -> None:
 
     render_result_table(filtered_df)
     render_affiliate()
+    render_related_sites()
     render_disclaimer()
 
 
